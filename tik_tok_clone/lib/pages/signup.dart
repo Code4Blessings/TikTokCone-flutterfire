@@ -1,49 +1,34 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:tik_tok_clone/models/variables.dart';
-import 'package:tik_tok_clone/pages/signup.dart';
-import './pages.dart';
+import 'package:tik_tok_clone/pages/pages.dart';
 
-class NavigationPage extends StatefulWidget {
+class SignUpPage extends StatefulWidget {
   @override
-  _NavigationPageState createState() => _NavigationPageState();
+  _SignUpPageState createState() => _SignUpPageState();
 }
 
-class _NavigationPageState extends State<NavigationPage> {
-  bool isSigned = false;
-
-  @override
-  void initState() {
-    super.initState();
-    FirebaseAuth.instance.authStateChanges().listen((user) {
-      if (user != null) {
-        setState(() {
-          isSigned = true;
-        });
-      } else {
-        setState(() {
-          isSigned = false;
-        });
-      }
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: isSigned == false ? Login() : HomePage(),
-    );
-  }
-}
-
-class Login extends StatefulWidget {
-  @override
-  _LoginState createState() => _LoginState();
-}
-
-class _LoginState extends State<Login> {
+class _SignUpPageState extends State<SignUpPage> {
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
+  TextEditingController usernameController = TextEditingController();
+
+  registerUser() {
+    FirebaseAuth.instance
+        .createUserWithEmailAndPassword(
+            email: emailController.text, password: passwordController.text)
+        .then((signedUser) {
+      userCollection.doc(signedUser.user.uid).set({
+        'username': usernameController.text,
+        'password': passwordController.text,
+        'email': emailController.text,
+        'uid': signedUser.user.uid,
+        'profilepic':
+            'https://media-exp1.licdn.com/dms/image/C4D03AQGf401qFr-mKA/profile-displayphoto-shrink_200_200/0?e=1602720000&v=beta&t=VUIqS71Qen3UQf64ddCYMq4A4YOkEt21MnTTPaASKP4'
+      });
+    });
+    Navigator.pop(context);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -57,7 +42,8 @@ class _LoginState extends State<Login> {
             Text('Welcome to Tik Tok',
                 style: myStyle(25, Colors.black, FontWeight.w600)),
             SizedBox(height: 10),
-            Text('Login', style: myStyle(25, Colors.black, FontWeight.w600)),
+            Text('Create An Acount',
+                style: myStyle(25, Colors.black, FontWeight.w600)),
             SizedBox(height: 10),
             Container(
               margin: EdgeInsets.only(left: 20, right: 20),
@@ -79,6 +65,23 @@ class _LoginState extends State<Login> {
               margin: EdgeInsets.only(left: 20, right: 20),
               width: MediaQuery.of(context).size.width,
               child: TextField(
+                controller: usernameController,
+                decoration: InputDecoration(
+                  fillColor: Colors.white,
+                  filled: true,
+                  labelText: 'Username',
+                  prefixIcon: Icon(Icons.person),
+                  labelStyle: myStyle(20),
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(20)),
+                ),
+              ),
+            ),
+            SizedBox(height: 10),
+            Container(
+              margin: EdgeInsets.only(left: 20, right: 20),
+              width: MediaQuery.of(context).size.width,
+              child: TextField(
                 controller: passwordController,
                 decoration: InputDecoration(
                   fillColor: Colors.white,
@@ -93,17 +96,7 @@ class _LoginState extends State<Login> {
             ),
             SizedBox(height: 10),
             InkWell(
-              onTap: () {
-                try {
-                  FirebaseAuth.instance.signInWithEmailAndPassword(
-                      email: emailController.text,
-                      password: passwordController.text);
-                } catch (err) {
-                  SnackBar snackBar =
-                      SnackBar(content: Text('Email or password is incorrect'));
-                  Scaffold.of(context);
-                }
-              },
+              onTap: () => registerUser(),
               child: Container(
                 width: MediaQuery.of(context).size.width / 2,
                 height: 50.0,
@@ -113,7 +106,7 @@ class _LoginState extends State<Login> {
                 ),
                 child: Center(
                   child: Text(
-                    'Login',
+                    'Register',
                     style: myStyle(20, Colors.white, FontWeight.w700),
                   ),
                 ),
@@ -124,15 +117,15 @@ class _LoginState extends State<Login> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
-                  'Dont have an account?',
+                  'Already have an account?',
                   style: myStyle(20),
                 ),
                 SizedBox(width: 10),
                 InkWell(
                   onTap: () => Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => SignUpPage())),
+                      MaterialPageRoute(builder: (context) => Login())),
                   child: Text(
-                    'Register',
+                    'Signin',
                     style: myStyle(20, Colors.purple),
                   ),
                 ),
