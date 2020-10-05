@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:tik_tok_clone/home.dart';
+import './pages/pages.dart';
 
 void main() {
   runApp(MyApp());
@@ -9,12 +9,13 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      debugShowCheckedModeBanner: false,
+      title: 'Tik Tok Clone',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        primarySwatch: Colors.purple,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: HomePage(),
+      home: NavigationPage(),
     );
   }
 }
